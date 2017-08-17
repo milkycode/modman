@@ -384,7 +384,7 @@ set_skipped ()
       echo "Module $module added to skip list."
     fi
   else
-    grep -v "^$module$" "$SKIP_FILE" > "$SKIP_FILE.tmp"; mv "$SKIP_FILE.tmp" "$SKIP_FILE" 
+    grep -v "^$module$" "$SKIP_FILE" > "$SKIP_FILE.tmp"; mv "$SKIP_FILE.tmp" "$SKIP_FILE"
     echo "Module $module removed from skip list."
   fi
 
@@ -620,7 +620,7 @@ apply_path ()
 # Automatically create a modman file
 run_automodman () #"$module" "$mm" "$wc_dir" "$wc_desc"
 {
-  # returns 0 on success 1 on error  
+  # returns 0 on success 1 on error
   amodule=$1
   amm=$2
   awc_dir=$3
@@ -630,13 +630,13 @@ run_automodman () #"$module" "$mm" "$wc_dir" "$wc_desc"
   #echo "in base directory $amm"
   #echo "in working copy $awc_dir"
   #echo "modman file will be or is $awc_desc"
-  
+
   #does the modman file exist?
   #yes
   if [ -r "$awc_desc" ]; then
     echo "$awc_desc file already exists"
     return 0 #exit without error
-    
+
   #no
   else
     #touch modman
@@ -647,7 +647,7 @@ run_automodman () #"$module" "$mm" "$wc_dir" "$wc_desc"
   declare -a incpaths
 
   for f in $(find $awc_dir \( ! -iname 'modman' ! -regex "$awc_dir.*/\..*" \)) #ignore hidden files and modman
-    do  
+    do
       #strip path down
       alngth=${#awc_dir} #length of working directory to remove from path
       alngth=$((alngth+1)) #increase by one to account for the fact we added a slash
@@ -659,16 +659,16 @@ run_automodman () #"$module" "$mm" "$wc_dir" "$wc_desc"
         # find a previous match for the path. if there is one the exitcode will be 1, otherwise 0.
         prevmatch=$(! printf -- '%s\n' "${ARRAY[@]}"  | grep -qv "${pathname/$incPath/}"; echo $?)
 
-        #if substring then do recurse        
+        #if substring then do recurse
         if [[ $prevmatch -eq 0 ]]; then #make sure we have not previously matched
 
-          #pre-existing path: yes | no?      
+          #pre-existing path: yes | no?
           if grep -rq "^[^#].*\s$pathname$" "${amm}/"*"/modman" #target is what is important so find end line not beginning line
           then #pre-existing path: yes
             echo "..."
             echo "A path was found that exists in below modman description file" #error
             grep -r --color=always "\s$pathname$" "${amm}/"*"/modman"
-            echo "It is therefore presently illegal for it to be included in this module." 
+            echo "It is therefore presently illegal for it to be included in this module."
             echo "..."
             if [[ -d $f ]]; then
                     incpaths+=("$pathname")
@@ -680,15 +680,15 @@ run_automodman () #"$module" "$mm" "$wc_dir" "$wc_desc"
             if [[ "$include" == "" ]]; then
                  include="N"
             fi
-        
+
             if [ "$include" == "y" -o "$include" == "Y" ]; then #include path: yes
-          
+
               echo "..."
               echo "You answered y:yes modman will include the path"
               echo "..."
 
               #write path to modman
-              echo "$pathname  $pathname" >> $awc_desc #substring ${var:start} 
+              echo "$pathname  $pathname" >> $awc_desc #substring ${var:start}
               #was it a directory or file
               if [[ -d $f ]]; then
                   incpaths+=("$pathname")
@@ -697,9 +697,9 @@ run_automodman () #"$module" "$mm" "$wc_dir" "$wc_desc"
             elif [ "$include" == "n" -o "$include" == "N" ]; then #include path: no
               echo "You answered N:no, modman is not including the path"
             else
-              echo "Warning: you answered $include which is invalid, modman is not including path"  
-            fi    
-        
+              echo "Warning: you answered $include which is invalid, modman is not including path"
+            fi
+
           fi # test other modules for pre-existing path
         fi # test prvious match
       fi #continue
@@ -747,6 +747,12 @@ while true; do
       ;;
     --modmandir)
       shift; modmandir="$1"; shift
+      ############################
+      #fix --modmandir path
+      #author: milan@milkycode.com
+      cd ..
+      root=$(pwd)
+      #endfix
       if ! [ -n "$modmandir" -a -d "$root/$modmandir" ]; then
         echo "Specified --modmandir does not exist; $modmandir"; exit 1
       fi
@@ -1237,4 +1243,3 @@ case "$action" in
     exit 1
 
 esac
-
